@@ -14,18 +14,18 @@ const connect = (url) => {
 
 const consume = curry((url, queue, handler) => {
   return connect(url)
-      .then((ch) => {
-        ch.assertQueue(queue, CHANNEL_OPTIONS)
-        ch.consume(queue, (msg) => {
-          Promise.resolve(msg)
-            .then(handler)
-            .then(() => ch.ack(msg))
-            .catch((err) => {
-              console.error(err.stack || err)
-              ch.nack()
-            })
-        })
+    .then((ch) => {
+      ch.assertQueue(queue, CHANNEL_OPTIONS)
+      ch.consume(queue, (msg) => {
+        Promise.resolve(msg)
+          .then(handler)
+          .then(() => ch.ack(msg))
+          .catch((err) => {
+            console.error(err.stack || err)
+            ch.nack()
+          })
       })
+    })
 })
 
 const sendToQueue = curry((url, queue, buffer) => {
@@ -33,8 +33,7 @@ const sendToQueue = curry((url, queue, buffer) => {
     .then((ch) => {
       ch.assertQueue(queue, CHANNEL_OPTIONS)
       ch.on('error', (err) => console.error(err.stack || err))
-      ch.sendToQueue('TEST', buffer, QUEUE_OPTIONS)
-      return buffer
+      return ch.sendToQueue(queue, buffer, QUEUE_OPTIONS)
     })
 })
 
